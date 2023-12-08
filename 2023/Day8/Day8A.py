@@ -3,71 +3,50 @@ from collections import Counter
 
 CON = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
 
+instructions = list()
 
-
-def checkline(s):
-    mred = -1
-    mgreen = -1
-    mblue = -1
-    game = (s.split(": "))[1].split("; ")
-    for draw in game:
-        draw = draw.split(", ")
-        for set in draw:
-            numberOfBalls = int((set.split())[0])
-            color = (set.split())[1]
-            if color == "red":
-                mred = max(mred, numberOfBalls)
-            elif color == "green":
-                mgreen = max(mgreen, numberOfBalls)
-            elif color == "blue":
-                mblue = max(mblue, numberOfBalls)
-    return mred * mgreen * mblue
+def search(n, tree_f, tree_s, letter):
+    if letter == "ZZZ":
+        return
+    print(n)
+    print(letter)
+    print(instructions[n%len(instructions)])
+    print(tree_s[tree_f.index(letter)][instructions[n % len(instructions)]])
+    print()
+    return search(n + 1, tree_f, tree_s, tree_s[tree_f.index(letter)][instructions[n % len(instructions)]])
+    
 
 
 file1 = open('input.txt', 'r')
 Lines = file1.readlines()
- 
-hands = list()
-for line in Lines:
-    prehand = line.split()[0]
-    bid = line.split()[1]
-    hand = list()
-    for card in prehand:
-        hand.append(CON.index(card))
-        
-    res = list(Counter(hand).values())
-    res.sort(reverse=True)
-    print(res)
-    
-    type = 0 #5 of a kind, 4 of a kind, 3/2, 3, 2 2, 1
-    if res[0] == 5:
-        type = 6
-    elif res[0] == 4:
-        type = 5
-    elif res[0] == 3 and res[1] == 2:
-        type = 4
-    elif res[0] == 3:
-        type = 3
-    elif res[0] == 2 and res[1] == 2:
-        type = 2
-    elif res[0] == 2:
-        type = 1
-    elif res[0] == 1:
-        type = 0
+
+
+temp = Lines[0][:-1]
+for i in range(len(temp)):
+    if temp[i] == "R":
+        instructions.append(1)
     else:
-        print("HELPP")
-        
-    print(type)
-    
-    hands.append([type, hand, int(bid)])
-    
-hands.sort(key=lambda i: (i[0], i[1][0],  i[1][1],  i[1][2],  i[1][3],  i[1][4]), reverse=True)
+        instructions.append(0)
 
-print(hands)
+input_first = list()
+input_second = list()
+for i in range(2, len(Lines)):
+    line = Lines[i]
+    first = line.split(" = ")[0]
+    second = [line[7:10], line[12:15]]
+    input_first.append(first)
+    input_second.append(second)
+    #print(first)
+    #print(second)
 
-sum = 0
-for i in range(len(hands)):
-    sum += (len(hands) - i) * hands[i][2]
-
-print(sum)
+print(input_first)
+print(input_second)
+# search(0, input_first, input_second, "AAA")
 # foo.sort(key=lambda i: (i[1], i[0]))
+
+i = 0
+letter = "AAA"
+while letter != "ZZZ":
+    letter = input_second[input_first.index(letter)][instructions[i % len(instructions)]]
+    i += 1
+    print(i)
